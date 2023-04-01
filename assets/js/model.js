@@ -45,7 +45,7 @@ let maxSizeOribit = 200;
 
 const orbitSegmentWeight = 20;
 const orbitSegmentPadding = orbitSegmentWeight /2;
-const contentPriorityMax = 10;
+const contentPriorityMax = 11;
 const techPriorityMax = 3;
 
 const hueStep = 10;
@@ -190,26 +190,14 @@ function setup() {
   // Anything else
   fill(200);
   stroke(0);
-
-  translate(width/2, height/2);
-  maxSizeOribit = width > height ? height * 0.8 : width *0.8;
 }
 
 
 
 function draw() {
 
-  /* ----------------------------------------------------------------------- */
-  // Log globals
-  if (!canvasParams.mouseLock) {
-    canvasParams.mouseX = mouseX;
-    canvasParams.mouseY = mouseY;
-    // logInfo();
-  }
-
-  /* ----------------------------------------------------------------------- */
-  // Provide your Code below
-
+  translate(width/2, height/2);
+  maxSizeOribit = width > height ? height * 0.8 : width *0.8;
   renderContentModel();
   
 
