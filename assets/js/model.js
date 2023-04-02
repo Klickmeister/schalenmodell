@@ -47,7 +47,8 @@ const orbitSegmentWeight = 20;
 const orbitSegmentPadding = orbitSegmentWeight /2;
 const contentPriorityMax = 11;
 const techPriorityMax = 3;
-
+const datafile = './data/erco-services-gesamtprio.json';
+const prioField = 'Gesamtprio';
 const hueStep = 10;
 const hueStartContent = 360 - contentPriorityMax * hueStep;
 
@@ -70,6 +71,7 @@ class OrbitElement{
     this.alpha = objectData.alpha;
     this.content = objectData.content;
     this.id = slugify(this.content["Webservice/ Service"]);
+    this.segment = this.createOrbitSegment();
     this.element = this.createOrbitElement();
     
     this.addElementInfo();
@@ -81,6 +83,7 @@ class OrbitElement{
   }
 
   addListener(){
+    this.segment.addEventListener("click", this.onClickAction, false);
     this.element.addEventListener("click", this.onClickAction, false);
   }
 
@@ -88,7 +91,7 @@ class OrbitElement{
     infoConsole.innerHTML = helperPrettifyLogs(this.content);
   }
 
-  createOrbitElement(){
+  createOrbitSegment(){
     strokeWeight(99);
     stroke(this.hue,100,100,this.alpha);
     strokeCap(SQUARE);
@@ -98,6 +101,21 @@ class OrbitElement{
     const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
     latestElement.setAttribute("id", this.id);
     latestElement.setAttribute("stroke-width", orbitSegmentWeight);
+    return latestElement;
+  }
+
+  createOrbitElement(){
+    strokeWeight(99);
+    stroke(this.hue,0,0,this.alpha * 2);
+    fill(0,0,100,30);
+    const angle = this.begin + ((this.end - this.begin) /2);
+    const x = cos(angle) * this.radius/2;
+    const y = sin(angle) * this.radius/2;
+    ellipse(x, y, orbitSegmentWeight);
+    const elements = [...document.querySelectorAll("svg path")];
+    const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
+    latestElement.setAttribute("id", this.id);
+    latestElement.setAttribute("stroke-width", 2);
     return latestElement;
   }
 }
@@ -135,7 +153,7 @@ function drawOribitElements(elementsForPrio, prio){
 function getOrbitElementsWithForPrio(prio){
   const orbitElementsForPrio = Object.entries(orbitElementList).filter((entry) => {
     const [key, value] = entry;
-    if(value["fachliche Priorität"] === prio) return value;
+    if(value[prioField] === prio) return value;
     return false;
   });
   return orbitElementsForPrio;
@@ -159,7 +177,7 @@ P5 Functions
 ############################################################################ */
 
 function preload() {
-  const url = './data/erco-services.json';
+  const url = datafile;
   orbitElementList = loadJSON(url);
 }
 
