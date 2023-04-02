@@ -42,7 +42,11 @@ const loggingParams = {
 
 let orbitElementList;
 let maxSizeOribit = 200;
+let shiftOrbit = -100;
+let fontNormal;
+let fontBold;
 
+const fontsize = 16;
 const orbitSegmentWeight = 20;
 const orbitSegmentPadding = orbitSegmentWeight /2;
 const contentPriorityMax = 11;
@@ -73,6 +77,7 @@ class OrbitElement{
     this.id = slugify(this.content["Webservice/ Service"]);
     this.segment = this.createOrbitSegment();
     this.element = this.createOrbitElement();
+    this.fillOpacity;
     
     this.addElementInfo();
     this.addListener();
@@ -82,9 +87,22 @@ class OrbitElement{
     console.log(this.id);
   }
 
+  onMouseOverActionElement(event){
+    const target = event.target;
+    this.fillOpacity = target.getAttribute("fill-opacity");
+    target.setAttribute("fill-opacity", 1);
+  }
+
+  onMouseOutActionElement(event){
+    const target = event.target;
+    target.setAttribute("fill-opacity", this.fillOpacity);
+  }
+
   addListener(){
     this.segment.addEventListener("click", this.onClickAction, false);
     this.element.addEventListener("click", this.onClickAction, false);
+    this.element.addEventListener("mouseover", this.onMouseOverActionElement, false);
+    this.element.addEventListener("mouseout", this.onMouseOutActionElement, false);
   }
 
   addElementInfo(){
@@ -92,19 +110,20 @@ class OrbitElement{
   }
 
   createOrbitSegment(){
+    push();
+    translate(shiftOrbit, 0);
     strokeWeight(99);
-    stroke(this.hue,100,100,this.alpha);
+    stroke(this.hue,80,100,this.alpha);
     strokeCap(SQUARE);
     noFill();
     arc(0,0,this.radius, this.radius, this.begin, this.end);
-    const elements = [...document.querySelectorAll("svg path")];
-    const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
-    latestElement.setAttribute("id", this.id);
-    latestElement.setAttribute("stroke-width", orbitSegmentWeight);
-    return latestElement;
+    pop();
+    return getLatestElement(`segment-${this.id}`, orbitSegmentWeight);
   }
 
   createOrbitElement(){
+    push();
+    translate(shiftOrbit, 0);
     strokeWeight(99);
     stroke(this.hue,0,0,this.alpha * 2);
     fill(0,0,100,30);
@@ -112,60 +131,121 @@ class OrbitElement{
     const x = cos(angle) * this.radius/2;
     const y = sin(angle) * this.radius/2;
     ellipse(x, y, orbitSegmentWeight);
-    const elements = [...document.querySelectorAll("svg path")];
-    const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
-    latestElement.setAttribute("id", this.id);
-    latestElement.setAttribute("stroke-width", 2);
-    return latestElement;
+    pop();
+    return getLatestElement(`element-${this.id}`, 2);
   }
 }
 
+
+class Prio{
+  constructor(prio){
+    this.prio = prio;
+    this.elements = this.getOrbitElementsForPrio();
+    this.hue;
+    this.alpha;
+    this.radius;
+
+    if(this.elements.length > 0){
+      this.drawOribitElements();
+    }
+
+    this.annotation = this.annotate();
+  }
+
+  getOrbitElementsForPrio(){
+    const orbitElementsForPrio = Object.entries(orbitElementList).filter((entry) => {
+      const [key, value] = entry;
+      if(value[prioField] === this.prio) return value;
+      return false;
+    });
+    return orbitElementsForPrio;
+  }
+
+  showElements(){
+    textFont(fontNormal);
+    textSize(fontsize);
+    strokeWeight(0);
+    fill(this.hue, 20,100,100);
+    // translate(0,0);
+    const content = this.elements.map(ele=>{
+      const [key, value] = ele;
+      return value['Content/Tool'];
+    });
+    console.log(content);
+    const textContent = content.join("\n");
+    text(textContent, maxSizeOribit * 0.3, 0);
+
+    //let div = createDiv('').size(100, 100);
+    //div.html(textContent);
+
+  }
+
+  annotate(){
+    textFont(fontNormal);
+    textSize(fontsize);
+    strokeWeight(99);
+    fill(this.hue, 80,100,100);
+    push();
+    translate(width * -0.5, height * -0.5);
+    const y = this.prio * fontsize + fontsize;
+    text(`Prio ${this.prio}`, 0, y);
+    pop();
+
+    const element = getLatestElement(`prio-${this.prio}`, 2);
+    element.addEventListener('click', ()=>{
+      this.showElements();
+    }, false);
+  }
+
+  drawOribitElements(){
+    const elementNumber = this.elements.length;
+    const elementAngle = 360 / elementNumber;
+    this.radius = maxSizeOribit - (this.prio * orbitSegmentWeight * 2.5);
+    this.hue = (hueStartContent + this.prio * hueStep) % 360;
+    this.alpha = alphaStart + this.prio + alphaStepContent;
+  
+    let begin = random(0,360);
+    let count = 0;
+    
+    const radius = this.radius;
+    const hue = this.hue;
+    const alpha = this.alpha;
+
+    this.elements.forEach(ele => {
+      const [key, content] = ele;
+      const padding = orbitSegmentPadding;
+      const end = begin + elementAngle - padding;
+      const objectData = {
+        alpha, radius, begin, end, hue, content
+      };
+      const element = new OrbitElement(objectData);
+      begin = end + padding;
+      count ++;
+    });
+  }
+}
 
 
 /* ###########################################################################
 Custom Functions
 ############################################################################ */
 
-function drawOribitElements(elementsForPrio, prio){
-
-  const elementNumber = elementsForPrio.length;
-  const elementAngle = 360 / elementNumber;
-  const radius = maxSizeOribit - (prio * orbitSegmentWeight * 2.5);
-  const hue = (hueStartContent + prio * hueStep) % 360;
-  const alpha = alphaStart + prio + alphaStepContent;
-
-  let begin = random(0,360);
-  let count = 0;
-
-  elementsForPrio.forEach(ele => {
-    const [key, content] = ele;
-    const padding = orbitSegmentPadding;
-    const end = begin + elementAngle - padding;
-    const objectData = {
-      alpha, radius, begin, end, hue, content
-    };
-    const element = new OrbitElement(objectData);
-    begin = end + padding;
-    count ++;
-  });
-}
-
-function getOrbitElementsWithForPrio(prio){
-  const orbitElementsForPrio = Object.entries(orbitElementList).filter((entry) => {
-    const [key, value] = entry;
-    if(value[prioField] === prio) return value;
-    return false;
-  });
-  return orbitElementsForPrio;
+function getLatestElement(id, newStrokeWeight){
+  const elements = [...document.querySelectorAll("svg path")];
+  const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
+  latestElement.parentElement.setAttribute("id", id);
+  latestElement.setAttribute("stroke-width", newStrokeWeight);
+  return latestElement;
 }
 
 function renderContentModel(){
   for(let prio = 0; prio < contentPriorityMax;  prio++){
-    const elementsForPrio = getOrbitElementsWithForPrio(prio);
+    const prioObject = new Prio(prio);
     
-    if(elementsForPrio.length > 0){
-      drawOribitElements(elementsForPrio, prio);
-    }
+    
+
+
+    // const annotation = new PrioAnnotation(prio);
   }
   
 }
@@ -179,6 +259,7 @@ P5 Functions
 function preload() {
   const url = datafile;
   orbitElementList = loadJSON(url);
+  fontNormal = loadFont('assets/fonts/RobotoCondensed-Regular.ttf');
 }
 
 function setup() {
@@ -215,10 +296,10 @@ function setup() {
 function draw() {
 
   translate(width/2, height/2);
-  maxSizeOribit = width > height ? height * 0.8 : width *0.8;
+  maxSizeOribit = width > height ? height * 0.75 : width *0.75;
+  shiftOrbit = (width/2 - maxSizeOribit/2) * -0.9;
   renderContentModel();
   
-
 }
 
 
