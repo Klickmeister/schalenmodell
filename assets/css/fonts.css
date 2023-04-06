@@ -1,30 +1,30 @@
 @font-face {
   font-family: "RobotoCondensed";
-  src: url("/assets/fonts/RobotoCondensed-Light.ttf");
+  src: url("../fonts/RobotoCondensed-Light.ttf");
 }
 
 @font-face {
   font-family: "RobotoCondensed";
   font-weight: 700;
-  src: url("/assets/fonts/RobotoCondensed-Bold.ttf");
+  src: url("../fonts/RobotoCondensed-Bold.ttf");
 }
 
 @font-face {
   font-family: "RobotoCondensed";
   font-weight: 400;
-  src: url("/assets/fonts/RobotoCondensed-Regular.ttf");
+  src: url("../fonts/RobotoCondensed-Regular.ttf");
 }
 
 @font-face {
   font-family: 'MaterialIcons';
   font-style: normal;
   font-weight: 400;
-  src: url(./assets/fonts/MaterialIcons/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: url(../fonts/MaterialIcons/MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local('Material Icons'),
     local('MaterialIcons-Regular'),
-    url(./assets/fonts/MaterialIcons/MaterialIcons-Regular.woff2) format('woff2'),
-    url(./assets/fonts/MaterialIcons/MaterialIcons-Regular.woff) format('woff'),
-    url(./assets/fonts/MaterialIcons/MaterialIcons-Regular.ttf) format('truetype');
+    url(../fonts/MaterialIcons/MaterialIcons-Regular.woff2) format('woff2'),
+    url(../fonts/MaterialIcons/MaterialIcons-Regular.woff) format('woff'),
+    url(../fonts/MaterialIcons/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {
