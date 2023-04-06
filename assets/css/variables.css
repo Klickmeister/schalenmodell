@@ -1,0 +1,34 @@
+:root{
+  --ff-sans: RobotoCondensed, Arial, Helvetica, sans-serif;
+
+  --xxs: 0.3rem;
+  --xs: 0.6rem;
+  --s: 0.75rem; 
+  --m: 1rem;
+  --l: 1.25rem;
+  --xl: 1.6rem;
+  --xxl: 1.8rem;
+
+  --half: 0.5em;
+  --quad: 0.25em;
+
+  --darken: rgba(0,0,0,0.5);
+  --lighten: rgba(255,255,255,0.5);
+  --light: hsl(0,0%,90%);
+  --lighter: hsl(0,0%,95%);
+  --lightest: hsl(0,0%,100%);
+
+  --tr-fast: 0.3s;
+  --tr-medium: 0.6s;
+  --tr-slow: 1s;
+
+  --lh-tight: 100%;
+  --lh-normal: 130%;
+
+  --active-color: hsl(0,0%,10%);
+  --interaction-color: rgb(255, 147, 0);
+
+  --op-strong: 0.8;
+  --op-medium: 0.6;
+  --op-light: 0.2;
+}

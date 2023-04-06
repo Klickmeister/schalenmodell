@@ -1,0 +1,52 @@
+body{
+  background-color: var(--grayish-blue);
+  font-size: 18px;
+  font-family: var(--ff-sans);
+  position: relative;
+}
+
+h1, h2, h3{
+  font-family: var(--ff-sans);
+  font-weight: 700;
+  margin-bottom: var(--xs);
+}
+
+h1{ 
+  font-size: 1.6em;
+}
+
+h2{
+  font-size: 1.2em;
+  font-weight: 200;
+}
+
+h3, dt{
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+p, figure{
+  font-size: 1em;
+  margin-bottom: 2em;
+}
+
+dt{
+  margin-top: 2rem;
+}
+
+section{
+  background-color: cadetblue;
+}
+
+/* Tables
+############################################################################ */
+
+
+
+/* Main
+############################################################################ */
+
+
+
+/* Card
+############################################################################ */

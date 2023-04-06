@@ -33,16 +33,9 @@ const drawingParams = {
   strokeWeightStep: 0.1
 };
 
-// Params for logging
-const loggingParams = {
-  targetDrawingParams: document.getElementById('drawingParams'),
-  targetCanvasParams: document.getElementById('canvasParams'),
-  state: false
-};
 
 let orbitElementList;
 let maxSizeOribit = 200;
-let shiftOrbit = -100;
 let fontNormal;
 let fontBold;
 
@@ -53,14 +46,21 @@ const contentPriorityMax = 11;
 const techPriorityMax = 3;
 const datafile = './data/erco-services-gesamtprio.json';
 const prioField = 'Gesamtprio';
-const hueStep = 10;
-const hueStartContent = 360 - contentPriorityMax * hueStep;
+const colorStep = 10;
+const activeColor = [35, 100, 100];
 
-const alphaStart = 40;
+const alphaStart = 10;
 const alphaStepContent = (100 - alphaStart) / contentPriorityMax;
 
-const infoConsole = document.getElementById("console");
+const dataPanelHeadline = document.getElementById('data-panel-headline');
+const dataPanelContent = document.getElementById('data-panel-content');
+const prioPanelData = document.getElementById('prio-panel-data');
 
+let svgCanvas;
+let defaultCanvas;
+let canvasContainer;
+
+let activePrio = false;
 
 /* ###########################################################################
 Classes
@@ -73,83 +73,95 @@ class OrbitElement{
     this.begin = objectData.begin;
     this.end = objectData.end;
     this.alpha = objectData.alpha;
+    this.prio = objectData.prio;
     this.content = objectData.content;
     this.id = slugify(this.content["Webservice/ Service"]);
     this.segment = this.createOrbitSegment();
     this.element = this.createOrbitElement();
-    this.fillOpacity;
+    this.opacity;
     
     this.addElementInfo();
     this.addListener();
+    return this;
   }
 
   onClickAction(){
-    console.log(this.id);
+    const targetPrio = this.prio;
+    activePrio = targetPrio;
+
+    const targetPrioObject = prioObjects[targetPrio-1];
+    targetPrioObject.showElements();
+    renderContentModel();
   }
 
-  onMouseOverActionElement(event){
+  onMouseOverActionSegment(event){
     const target = event.target;
-    this.fillOpacity = target.getAttribute("fill-opacity");
-    target.setAttribute("fill-opacity", 1);
+    this.opacity = target.getAttribute("stroke-opacity");
+    // target.setAttribute("stroke-opacity", 1);
   }
 
-  onMouseOutActionElement(event){
+  onMouseOutActionSegment(event){
     const target = event.target;
-    target.setAttribute("fill-opacity", this.fillOpacity);
+    // target.setAttribute("stroke-opacity", this.opacity);
   }
 
   addListener(){
-    this.segment.addEventListener("click", this.onClickAction, false);
-    this.element.addEventListener("click", this.onClickAction, false);
-    this.element.addEventListener("mouseover", this.onMouseOverActionElement, false);
-    this.element.addEventListener("mouseout", this.onMouseOutActionElement, false);
+    if(!this.segment) return;
+    const $this = this;
+    this.segment.addEventListener("click", function(){ $this.onClickAction($this) }, false);
+    this.element.addEventListener("click", function(){ $this.onClickAction($this) }, false);
+    this.segment.addEventListener("mouseover", this.onMouseOverActionSegment, false);
+    this.segment.addEventListener("mouseout", this.onMouseOutActionSegment, false);
   }
 
   addElementInfo(){
-    infoConsole.innerHTML = helperPrettifyLogs(this.content);
+    
   }
 
   createOrbitSegment(){
-    push();
-    translate(shiftOrbit, 0);
     strokeWeight(99);
-    stroke(this.hue,80,100,this.alpha);
+    stroke(this.hue,80,0,this.alpha);
     strokeCap(SQUARE);
     noFill();
     arc(0,0,this.radius, this.radius, this.begin, this.end);
-    pop();
-    return getLatestElement(`segment-${this.id}`, orbitSegmentWeight);
+    
+    return getLatestElement(`segment-${this.id}`, orbitSegmentWeight, false);
   }
 
   createOrbitElement(){
-    push();
-    translate(shiftOrbit, 0);
     strokeWeight(99);
     stroke(this.hue,0,0,this.alpha * 2);
-    fill(0,0,100,30);
+
+    const [hue, sat, bri] = activeColor;
+    fill(hue,sat,bri,this.alpha);
     const angle = this.begin + ((this.end - this.begin) /2);
     const x = cos(angle) * this.radius/2;
     const y = sin(angle) * this.radius/2;
-    ellipse(x, y, orbitSegmentWeight);
-    pop();
-    return getLatestElement(`element-${this.id}`, 2);
+    ellipse(x, y, orbitSegmentWeight * 0.7);
+    return getLatestElement(`element-${this.id}`, 1, false);
   }
 }
 
 
 class Prio{
   constructor(prio){
-    this.prio = prio;
+    this.prio =  prio;
     this.elements = this.getOrbitElementsForPrio();
+    this.orbitElements = [];
     this.hue;
-    this.alpha;
+    this.alpha = this.getAlpha();
     this.radius;
-
+  
     if(this.elements.length > 0){
       this.drawOribitElements();
     }
 
-    this.annotation = this.annotate();
+    this.navItem = this.createNavItem();
+  }
+
+  getAlpha(){
+    if(activePrio === false) return alphaStart + (this.prio * alphaStepContent);
+    return activePrio === this.prio ? 100 : 10;
   }
 
   getOrbitElementsForPrio(){
@@ -162,38 +174,41 @@ class Prio{
   }
 
   showElements(){
-    textFont(fontNormal);
-    textSize(fontsize);
-    strokeWeight(0);
-    fill(this.hue, 20,100,100);
-    // translate(0,0);
     const content = this.elements.map(ele=>{
       const [key, value] = ele;
       return value['Content/Tool'];
     });
-    console.log(content);
-    const textContent = content.join("\n");
-    text(textContent, maxSizeOribit * 0.3, 0);
 
-    //let div = createDiv('').size(100, 100);
-    //div.html(textContent);
+    const contentData = content.map(item=>{
+      return `<li>${item}</li>`;
+    });
 
+    dataPanelContent.innerHTML = `${contentData.join('')}`;
+    activePrio = this.prio;
+
+    if(this.elements.length > 0){
+      dataPanelHeadline.classList.add('is-active');
+      dataPanelContent.classList.add('is-active');
+    }else{
+      dataPanelHeadline.classList.remove('is-active');
+      dataPanelContent.classList.remove('is-active');
+    }
+    renderContentModel();
   }
 
-  annotate(){
-    textFont(fontNormal);
-    textSize(fontsize);
-    strokeWeight(99);
-    fill(this.hue, 80,100,100);
-    push();
-    translate(width * -0.5, height * -0.5);
-    const y = this.prio * fontsize + fontsize;
-    text(`Prio ${this.prio}`, 0, y);
-    pop();
+  createNavItem(){
+    const itemClasses = [];
+    if(activePrio === this.prio) itemClasses.push('is-active');
+    if(this.elements.length === 0) itemClasses.push('is-disabled');
+    const prioText = contentPriorityMax - this.prio;
+    const prioTextDisplay = prioText < 10 ? `0${prioText}` : prioText;
+    const prioElement = document.createElement('li');
+    prioElement.innerHTML = `Prio ${prioTextDisplay}`;
 
-    const element = getLatestElement(`prio-${this.prio}`, 2);
-    element.addEventListener('click', ()=>{
-      this.showElements();
+    prioElement.setAttribute('class', itemClasses.join(' '));
+    prioPanelData.appendChild(prioElement);
+    prioElement.addEventListener('click', ()=>{
+      this.showElements(), false;
     }, false);
   }
 
@@ -201,24 +216,28 @@ class Prio{
     const elementNumber = this.elements.length;
     const elementAngle = 360 / elementNumber;
     this.radius = maxSizeOribit - (this.prio * orbitSegmentWeight * 2.5);
-    this.hue = (hueStartContent + this.prio * hueStep) % 360;
-    this.alpha = alphaStart + this.prio + alphaStepContent;
-  
+    this.hue = 0;
+    
+    randomSeed(0);
+
     let begin = random(0,360);
     let count = 0;
     
     const radius = this.radius;
     const hue = this.hue;
     const alpha = this.alpha;
+    const prio = this.prio;
 
     this.elements.forEach(ele => {
       const [key, content] = ele;
       const padding = orbitSegmentPadding;
       const end = begin + elementAngle - padding;
       const objectData = {
-        alpha, radius, begin, end, hue, content
+        alpha, radius, begin, end, hue, content, prio
       };
       const element = new OrbitElement(objectData);
+      this.orbitElements.push(element.id);
+
       begin = end + padding;
       count ++;
     });
@@ -230,26 +249,31 @@ class Prio{
 Custom Functions
 ############################################################################ */
 
-function getLatestElement(id, newStrokeWeight){
+function getLatestElement(id, newStrokeWeight, assignIdToParent = true){
   const elements = [...document.querySelectorAll("svg path")];
   const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
-  latestElement.parentElement.setAttribute("id", id);
+  if(!latestElement) return false;
+
+  if(assignIdToParent) { latestElement.parentElement.setAttribute("id", id); }
+  else { latestElement.setAttribute("id", id); }
   latestElement.setAttribute("stroke-width", newStrokeWeight);
   return latestElement;
 }
 
+var prioObjects = [];
+
 function renderContentModel(){
-  for(let prio = 0; prio < contentPriorityMax;  prio++){
-    const prioObject = new Prio(prio);
-    
-    
+  clear();
+  prioPanelData.innerHTML = '';
 
-
-    // const annotation = new PrioAnnotation(prio);
-  }
+  const canvasWidth = canvasContainer.offsetWidth;
+  maxSizeOribit = canvasWidth *0.9;
   
+  for(let prio = 1; prio < contentPriorityMax; prio++){
+    const prioObject = new Prio(prio);
+    prioObjects.push(prioObject);
+  }
 }
-
 
 
 /* ###########################################################################
@@ -264,42 +288,27 @@ function preload() {
 
 function setup() {
 
-  let canvas;
-  if (canvasParams.mode === 'SVG') {
-    canvas = createCanvas(canvasParams.w, canvasParams.h, SVG);
-  } else { 
-    canvas = createCanvas(canvasParams.w, canvasParams.h);
-    canvas.parent("canvas");
-  }
-
+  svgCanvas = createCanvas(canvasParams.w, canvasParams.h, SVG);
+  defaultCanvas = document.querySelector(".p5Canvas");
+  canvasContainer = document.querySelector("#canvas");
+  canvasContainer.appendChild(defaultCanvas);
 
   // Display & Render Options
-  frameRate(25);
+  frameRate(1);
   angleMode(DEGREES);
   colorMode(HSB, 360, 100, 100, 100);
   smooth();
-
-  // GUI Management
-  if (canvasParams.gui) { 
-    const sketchGUI = createGui('Params');
-    sketchGUI.addObject(drawingParams);
-    noLoop();
-  }
-
+  noLoop();
+  
   // Anything else
   fill(200);
   stroke(0);
 }
 
-
-
 function draw() {
 
   translate(width/2, height/2);
-  maxSizeOribit = width > height ? height * 0.75 : width *0.75;
-  shiftOrbit = (width/2 - maxSizeOribit/2) * -0.9;
   renderContentModel();
-  
 }
 
 
@@ -396,19 +405,5 @@ function resizeMyCanvas() {
 
 function windowResized() {
   resizeMyCanvas();
-}
-
-
-
-function logInfo(content) {
-
-  if (loggingParams.targetDrawingParams) {
-    loggingParams.targetDrawingParams.innerHTML = helperPrettifyLogs(drawingParams);
-  }
-
-  if (loggingParams.targetCanvasParams) {
-    loggingParams.targetCanvasParams.innerHTML = helperPrettifyLogs(canvasParams);
-  }
-
 }
 

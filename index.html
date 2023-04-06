@@ -14,25 +14,32 @@ Schalenmodell für www.erco.com
   <title>Schalenmodell www.erco.com // v1.0</title>
   <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
 
-  <!-- Normalize -->
-  <link rel="stylesheet" href="assets/css/000-normalize.css">
-
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="assets/css/010-resets.css">
-  <link rel="stylesheet" href="assets/css/020-base.css">
-  <link rel="stylesheet" href="assets/css/030-typography.css">
-  <link rel="stylesheet" href="assets/css/040-layout.css">
-  <link rel="stylesheet" href="assets/css/050-components.css">
+  <link rel="stylesheet" href="./assets/css/reset.css">
+  <link rel="stylesheet" href="./assets/css/variables.css">
+  <link rel="stylesheet" href="./assets/css/fonts.css">
+  <link rel="stylesheet" href="./assets/css/base.css">
+  <link rel="stylesheet" href="./assets/css/layout.css">
+  <link rel="stylesheet" href="./assets/css/components.css">
 
 </head>
 
 <body>
-  <nav id="nav"></nav>
-  <!-- 
-    Available Canvas Modes: is-fixed, is-standard, is-fullscreen, is-16by9, is-small, is-large
-  -->
-  <main id="canvas" class="is-large"></main>
-  <aside id="console"></aside>
+
+  <main>
+    <div id="prio-panel">
+      <header>
+        <h1>Schalenmodell erco.com</h1>
+        <h2>Stand 04.2023</h2>
+      </header>
+      <ul id="prio-panel-data"></ul>
+    </div>
+    <div id="canvas"></div>
+    <div id="data-panel">
+      <h3 id="data-panel-headline">Services/ Content</h3>
+      <ul id="data-panel-content"></ul>
+    </div>
+  </main>
+  
   
   <!-- p5 & p5.dom -->
   <script src="assets/libs/p5.js/p5.min.js"></script>
@@ -45,10 +52,9 @@ Schalenmodell für www.erco.com
   <script src="assets/libs/quicksettings.min.js"></script>
   <script src="assets/libs/p5.js/p5.gui.min.js"></script>
 
-  <script src="assets/libs/p5.svg.js"></script>
+  <script src="https://unpkg.com/p5.js-svg@1.3.1"></script>
 
   <!-- Helper und Sketch -->
-  <script src="assets/js/helper.js"></script>
   <script src="assets/js/model.js"></script>
 
 </body>

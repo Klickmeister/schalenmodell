@@ -4,7 +4,7 @@
   "description": "Startercode for Generative Gestaltung",
   "main": "index.js",
   "scripts": {
-    "dev": "npx light-server -s . -w \"assets/**\""
+    "dev": "npx light-server -s . -w \"**\""
   },
   "repository": {
     "type": "git",

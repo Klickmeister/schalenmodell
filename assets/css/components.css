@@ -1,0 +1,126 @@
+/* ----------------------------------------------------------------------------
+components.css                                                                  
+Enthält alle Regeln zu Komponenten.  
+
+Wer es noch schöner möchte, möge sich mal https://cssguidelin.es/ anschauen.
+----------------------------------------------------------------------------*/
+
+
+
+/* Canvas
+-----------------------------------------------------------------------------*/
+
+#canvas {
+  z-index: 0;
+  transition: all 0.7;
+}
+
+
+/* Prio Panel
+-----------------------------------------------------------------------------*/
+#prio-panel{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#prio-panel header{
+  padding-left: 20%;
+}
+
+#prio-panel header h1,
+#prio-panel header h2{
+  line-height: var(--lh-tight);
+  padding-left: var(--quad);
+}
+
+#prio-panel header h2{
+  font-weight: normal;
+}
+
+#prio-panel-data{
+  padding-left: 20%;
+  padding-right: 20%;
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+#prio-panel-data > li{
+  display: block;
+  opacity: var(--op-medium);
+  padding: var(--quad) var(--xxs);
+  transition: background-color var(--tr-fast), color var(--tr-fast), margin-left var(--tr-fast);
+}
+
+#prio-panel-data > li:hover{
+  margin-left: -10px;
+  cursor: pointer;
+  opacity: 1;
+  color: var(--interaction-color);
+}
+
+#prio-panel-data > li.is-active{
+  opacity: 1;
+  background-color: var(--active-color);
+  color: var(--lightest);
+  position: relative;
+}
+
+#prio-panel-data > li.is-active::after {
+  font-family: 'MaterialIcons';
+  content: "chevron_right";
+  position: absolute;
+  right: var(--quad);
+  vertical-align: 0;
+}
+
+#prio-panel-data > li.is-disabled{
+  opacity: var(--op-light);
+}
+
+/* Data Panel
+-----------------------------------------------------------------------------*/
+#data-panel{
+  display: flex;
+  align-items: left;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+}
+
+#data-panel > header{
+  padding-left: 20%;
+  position: absolute;
+  top: 5%;
+  left: 0;
+  z-index: 1;
+}
+
+#data-panel-headline{
+  padding-left: 20%;
+  opacity: 0;
+  transition: opacity var(--tr-medium);
+}
+
+#data-panel-headline.is-active{
+  opacity: 1;
+}
+
+#data-panel-content{
+  padding-left: 20%;
+  width: 100%;
+  opacity: 0;
+  transition: opacity var(--tr-fast);
+}
+
+#data-panel-content.is-active{
+  opacity: 1;
+}
+
+#data-panel-content > li{
+  display: block;
+  margin-bottom: var(--quad);
+  line-height: var(--lh-tight);;
+  transition: background-color var(--tr-fast), color var(--tr-fast), margin-left var(--tr-fast);
+}
