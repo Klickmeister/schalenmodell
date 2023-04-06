@@ -5,12 +5,17 @@ Enthält alle übergreifenden typographischen Regeln.
 Wer es noch schöner möchte, möge sich mal https://cssguidelin.es/ anschauen.
 ----------------------------------------------------------------------------*/
 
-main{
-    display: grid;
-    grid-template-columns: 20% 50% 30%;
-    grid-template-areas: "prio canvas data";
-    height: 80vh;
+@media screen and (min-width: 1000px){
+
+    main{
+        display: grid;
+        grid-template-columns: 20% 50% 30%;
+        grid-template-areas: "prio canvas data";
+        height: 100vh;
+    }
+
 }
+
 
 .p5Canvas{
     display: block;

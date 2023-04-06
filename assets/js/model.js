@@ -311,9 +311,6 @@ function draw() {
   renderContentModel();
 }
 
-
-
-
 function keyPressed() {
 
   if (keyCode === 81) { // Q-Key
@@ -354,26 +351,15 @@ function keyPressed() {
 
 }
 
-
-
 function mousePressed() {}
-
-
 
 function mouseReleased() {}
 
-
-
 function mouseDragged() {}
-
-
 
 function keyReleased() {
   if (keyCode == DELETE || keyCode == BACKSPACE) clear();
 }
-
-
-
 
 
 /* ###########################################################################
@@ -391,17 +377,13 @@ function slugify(str){
 
 function getCanvasHolderSize() {
   canvasParams.w = canvasParams.holder.clientWidth;
-  canvasParams.h = canvasParams.holder.clientHeight;
+  canvasParams.h = document.body.clientHeight;
 }
-
-
 
 function resizeMyCanvas() {
   getCanvasHolderSize();
   resizeCanvas(canvasParams.w, canvasParams.h);
 }
-
-
 
 function windowResized() {
   resizeMyCanvas();
