@@ -125,3 +125,51 @@ Wer es noch schöner möchte, möge sich mal https://cssguidelin.es/ anschauen.
   line-height: var(--lh-tight);;
   transition: background-color var(--tr-fast), color var(--tr-fast), margin-left var(--tr-fast);
 }
+
+
+/* Nav Panel
+-----------------------------------------------------------------------------*/
+
+#nav-panel{
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  margin-left: 20%;
+  padding: 0;
+  padding-left: var(--quad);
+}
+
+#nav-panel > li{
+  transition: all var(--tr-fast);
+  display: block;
+  padding: var(--quad) var(--xxs);
+  border: solid 1px var(--interaction-color);
+  background-color: var(--lighter);
+}
+
+#nav-panel > li:first-child{
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+#nav-panel > li:last-child{
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+#nav-panel > li + li{
+  border-top: none;
+}
+
+#nav-panel > li:hover{
+  cursor: pointer;
+  background-color: var(--interaction-color);
+  color: var(--lightest);
+}
+
+#nav-panel > li.is-active{
+  background-color: var(--active-color);
+  color: var(--lightest);
+  border-color: var(--active-color);
+}

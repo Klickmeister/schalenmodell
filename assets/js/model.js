@@ -45,7 +45,7 @@ const orbitSegmentPadding = orbitSegmentWeight /2;
 const contentPriorityMax = 11;
 const techPriorityMax = 3;
 const datafile = './data/erco-services-gesamtprio.json';
-const prioField = 'Gesamtprio';
+
 const colorStep = 10;
 const activeColor = [35, 100, 100];
 
@@ -55,12 +55,29 @@ const alphaStepContent = (100 - alphaStart) / contentPriorityMax;
 const dataPanelHeadline = document.getElementById('data-panel-headline');
 const dataPanelContent = document.getElementById('data-panel-content');
 const prioPanelData = document.getElementById('prio-panel-data');
+const navPanel = document.getElementById('nav-panel');
+
+let prioField = false;
+const navOptions = [
+  {"headline": "Fachliche Priorität",
+    "key": "fachliche Priorität"
+  },
+  {"headline": "Technische Priorität",
+    "key": "Technische Priorität auf 10"
+  },
+  {
+    "headline": "Kombiniert",
+    "key": "Gesamtprio",
+    "isActive": true
+  }
+];
 
 let svgCanvas;
 let defaultCanvas;
 let canvasContainer;
 
 let activePrio = false;
+const prioObjects = [];
 
 /* ###########################################################################
 Classes
@@ -249,6 +266,39 @@ class Prio{
 Custom Functions
 ############################################################################ */
 
+function addNavOptions(){
+
+  navPanel.innerHTML = '';
+
+  navOptions.forEach(option => {
+    const navOption = document.createElement('li');
+    navOption.innerHTML = `${option.headline}`;
+    navOption.setAttribute('data-key', option.key);
+
+    if(option.isActive && option.isActive === true){
+      navOption.classList.add('is-active');
+      
+    }
+
+    navOption.addEventListener('click', function(){
+      
+      const key = this.getAttribute('data-key');
+  
+      const currentActiveNavOption = navOptions.find(option => option.isActive === true);
+      currentActiveNavOption.isActive = false;
+
+      const newActiveNavOption = navOptions.find(option => option.key === key);
+      newActiveNavOption.isActive = true;
+
+      
+      renderContentModel();
+    });
+    navPanel.appendChild(navOption);
+  });
+
+
+}
+
 function getLatestElement(id, newStrokeWeight, assignIdToParent = true){
   const elements = [...document.querySelectorAll("svg path")];
   const latestElement = elements.find(ele => Number(ele.getAttribute("stroke-width")) === 99 );
@@ -260,10 +310,22 @@ function getLatestElement(id, newStrokeWeight, assignIdToParent = true){
   return latestElement;
 }
 
-var prioObjects = [];
+function getDefaultNavOption(){
+  const activeNavOption = navOptions.find(option => option.isActive === true);
+  return activeNavOption.key;
+}
+
+function getActiveNavOption(){
+
+  if(!document.querySelector(".nav-panel li.is-active")) return getDefaultNavOption();
+  const activeNavOption = document.querySelector(".nav-panel li.is-active");
+  return activeNavOption.getAttribute('data-key');
+}
 
 function renderContentModel(){
   clear();
+
+  prioField = getActiveNavOption();
   prioPanelData.innerHTML = '';
 
   const canvasWidth = canvasContainer.offsetWidth;
@@ -273,6 +335,8 @@ function renderContentModel(){
     const prioObject = new Prio(prio);
     prioObjects.push(prioObject);
   }
+
+  addNavOptions();
 }
 
 

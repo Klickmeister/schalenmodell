@@ -31,4 +31,6 @@
   --op-strong: 0.8;
   --op-medium: 0.6;
   --op-light: 0.2;
+
+  --radius: 0.25em;
 }
