@@ -44,7 +44,7 @@ const orbitSegmentWeight = 20;
 const orbitSegmentPadding = orbitSegmentWeight /2;
 const contentPriorityMax = 11;
 const techPriorityMax = 3;
-const datafile = './data/erco-services-gesamtprio.json';
+const datafile = './data/erco-services-v2.0.json';
 
 const colorStep = 10;
 const activeColor = [35, 100, 100];
@@ -60,15 +60,19 @@ const navPanel = document.getElementById('nav-panel');
 let prioField = false;
 const navOptions = [
   {"headline": "Fachliche Priorität",
-    "key": "fachliche Priorität"
+    "key": "fachliche Priorität 1-10"
   },
-  {"headline": "Technische Priorität",
-    "key": "Technische Priorität auf 10"
+  {"headline": "Technischer Zustand",
+    "key": "Technischer Stand auf 10"
   },
   {
-    "headline": "Kombiniert",
-    "key": "Gesamtprio",
+    "headline": "Priorität Gesamt",
+    "key": "Gesamt- prio",
     "isActive": true
+  },
+  {
+    "headline": "Handlungsbedarf",
+    "key": "Handlungs- bedarf",
   }
 ];
 
@@ -220,7 +224,7 @@ class Prio{
     const prioText = contentPriorityMax - this.prio;
     const prioTextDisplay = prioText < 10 ? `0${prioText}` : prioText;
     const prioElement = document.createElement('li');
-    prioElement.innerHTML = `Prio ${prioTextDisplay}`;
+    prioElement.innerHTML = `${prioTextDisplay}`;
 
     prioElement.setAttribute('class', itemClasses.join(' '));
     prioPanelData.appendChild(prioElement);
