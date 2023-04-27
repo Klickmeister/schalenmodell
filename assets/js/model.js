@@ -44,7 +44,7 @@ const orbitSegmentWeight = 20;
 const orbitSegmentPadding = orbitSegmentWeight /2;
 const contentPriorityMax = 11;
 const techPriorityMax = 3;
-const datafile = './data/erco-services-v2.0.json';
+const datafile = './data/erco-services-v3.0.json';
 
 const colorStep = 10;
 const activeColor = [35, 100, 100];
